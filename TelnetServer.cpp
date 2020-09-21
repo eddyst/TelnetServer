@@ -1,15 +1,22 @@
 #include "TelnetServer.h"
-//TelnetServer::TelnetServer(int port ){}
 
-void TelnetServer::TelnetMsg(String text){
+TelnetServer::TelnetServer(int port):WiFiServer( port ){
+}
+
+size_t TelnetServer::write(uint8_t b) {
+    return write(&b, 1);
+}
+
+size_t TelnetServer::write(const uint8_t *buffer, size_t size) {
   for(uint8_t i = 0; i < MAX_TELNET_CLIENTS; i++)
   {
     if (TelnetClient[i] || TelnetClient[i].connected())
     {
-      TelnetClient[i].println(text);
+      TelnetClient[i].write(buffer, size);
+      TelnetClient[i].flush();
     }
   }
-  delay(10);  // to avoid strange characters left in buffer
+  return size;
 }
 
 void TelnetServer::handle(){

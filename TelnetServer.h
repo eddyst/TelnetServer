@@ -1,6 +1,12 @@
 #pragma once
 #include <Arduino.h>
-#include <ESP8266WiFi.h>
+#ifdef ESP32
+  #include <WiFi.h>
+#elif defined(ESP8266)
+  #include <ESP8266WiFi.h>
+#else
+  #error Platform not supported
+#endif
 
 #define MAX_TELNET_CLIENTS 2
 
@@ -10,7 +16,8 @@ class TelnetServer : public WiFiServer{
     bool ConnectionEstablished; // Flag for successfully handled connection
 
   public:
-    TelnetServer(int port);
-    void TelnetMsg(String text);
+    TelnetServer(int port = 23);
     void handle();
+    size_t write(uint8_t b);
+    size_t write(const uint8_t *buffer, size_t size);
 };
