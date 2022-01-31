@@ -7,6 +7,9 @@
 #else
   #error Platform not supported
 #endif
+#ifndef DEBUG_TELNET_Verbose
+  #define DEBUG_TELNET_Verbose 0
+#endif
 
 #define MAX_TELNET_CLIENTS 2
 

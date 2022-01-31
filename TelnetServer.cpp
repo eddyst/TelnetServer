@@ -25,7 +25,9 @@ void TelnetServer::handle(){
   {
     if (TelnetClient[i] && !TelnetClient[i].connected())
     {
-      Serial.print("Client disconnected ... terminate session "); Serial.println(i+1); 
+      #if defined DEBUG_SERIAL && DEBUG_TELNET_Verbose >= 3
+        DEBUG_SERIAL.print("Client disconnected ... terminate session "); DEBUG_SERIAL.println(i+1); 
+      #endif
       TelnetClient[i].stop();
     }
   }
@@ -37,15 +39,19 @@ void TelnetServer::handle(){
     
     for(uint8_t i = 0; i < MAX_TELNET_CLIENTS; i++)
     {
-      // Serial.print("Checking telnet session "); Serial.println(i+1);
-      
+      #if defined DEBUG_SERIAL && DEBUG_TELNET_Verbose >= 5
+        DEBUG_SERIAL.print("Checking telnet session "); DEBUG_SERIAL.println(i+1);
+      #endif
+
       // find free socket
       if (!TelnetClient[i])
       {
         TelnetClient[i] = available(); 
         
-        Serial.print("New Telnet client connected to session "); Serial.println(i+1);
-        
+        #if defined DEBUG_SERIAL && DEBUG_TELNET_Verbose >= 3
+          DEBUG_SERIAL.print("New Telnet client connected to session "); DEBUG_SERIAL.println(i+1);
+        #endif
+
         TelnetClient[i].flush();  // clear input buffer, else you get strange characters
         TelnetClient[i].println("Welcome!");
         
@@ -63,13 +69,17 @@ void TelnetServer::handle(){
       }
       else
       {
-        // Serial.println("Session is in use");
+        #if defined DEBUG_SERIAL && DEBUG_TELNET_Verbose >= 5
+          DEBUG_SERIAL.println("Session is in use");
+        #endif
       }
     }
 
     if (ConnectionEstablished == false)
     {
-      Serial.println("No free sessions ... drop connection");
+      #if defined DEBUG_SERIAL && DEBUG_TELNET_Verbose >= 3
+        DEBUG_SERIAL.println("No free sessions ... drop connection");
+      #endif
       available().stop();
       // TelnetMsg("An other user cannot connect ... MAX_TELNET_CLIENTS limit is reached!");
     }
@@ -84,7 +94,11 @@ void TelnetServer::handle(){
         //get data from the telnet client
         while(TelnetClient[i].available())
         {
-          Serial.write(TelnetClient[i].read());
+          #if defined DEBUG_SERIAL && DEBUG_TELNET_Verbose >= 3
+            DEBUG_SERIAL.write(TelnetClient[i].read());
+          #else
+            TelnetClient[i].read();
+          #endif
         }
       }
     }
