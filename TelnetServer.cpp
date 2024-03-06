@@ -46,7 +46,11 @@ void TelnetServer::handle(){
       // find free socket
       if (!TelnetClient[i])
       {
-        TelnetClient[i] = available(); 
+        #if ESP_IDF_VERSION_MAJOR >= 4
+          TelnetClient[i] = accept(); 
+        #else
+          TelnetClient[i] = available(); 
+        #endif
         
         #if defined DEBUG_SERIAL && DEBUG_TELNET_Verbose >= 3
           DEBUG_SERIAL.print("New Telnet client connected to session "); DEBUG_SERIAL.println(i+1);
@@ -80,7 +84,12 @@ void TelnetServer::handle(){
       #if defined DEBUG_SERIAL && DEBUG_TELNET_Verbose >= 3
         DEBUG_SERIAL.println("No free sessions ... drop connection");
       #endif
-      available().stop();
+      #if ESP_IDF_VERSION_MAJOR >= 4
+        accept().stop();; 
+      #else
+        available().stop();
+      #endif
+      
       // TelnetMsg("An other user cannot connect ... MAX_TELNET_CLIENTS limit is reached!");
     }
   }
